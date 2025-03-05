@@ -53,7 +53,7 @@ func NewSpoofer(spoofedAddr, targetAddr net.IP, payloadSize int) (*Spoofer, erro
 	return &Spoofer{
 		fd:          fd,
 		spoofedPort: 53, // Standard DNS server port
-		targetPort:  53, // Changed: Use standard DNS client port instead of 33333
+		targetPort:  33333,
 		spoofedAddr: spoofedAddr,
 		targetAddr:  targetAddr,
 		ipTemplate:  ipTemplate,

